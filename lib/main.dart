@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
-import 'screens/feed_screen.dart';
-import 'screens/new_post_screen.dart';
+import 'screens/register_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,9 +17,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
-        '/feed': (context) => FeedScreen(),
-        '/new_topic': (context) =>
-            NewPostScreen(onPostCreated: (title, description) {}),
+        '/register': (context) => RegisterScreen(),
       },
     );
   }
