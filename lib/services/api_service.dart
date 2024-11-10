@@ -39,9 +39,9 @@ class ApiService {
   }
 
   Future<void> createPost(
-      String title, String description, String authorId) async {
+      String title, String description, String tag, String authorId) async {
     print(
-        "Enviando requisição para criar post com title: $title, description: $description, authorId: $authorId");
+        "Enviando requisição para criar post com title: $title, description: $description, tag: $tag, authorId: $authorId");
 
     final response = await http.post(
       Uri.parse('$apiUrl/posts'),
@@ -49,6 +49,7 @@ class ApiService {
       body: json.encode({
         'title': title,
         'description': description,
+        'tag': tag,
         'author': authorId,
       }),
     );

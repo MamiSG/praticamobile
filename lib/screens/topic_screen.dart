@@ -1,3 +1,5 @@
+// lib/screens/topic_screen.dart
+
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/user.dart';
@@ -20,7 +22,6 @@ class _TopicScreenState extends State<TopicScreen> {
   @override
   void initState() {
     super.initState();
-
     comments = (widget.post['comments'] as List<dynamic>)
         .map((comment) => Map<String, dynamic>.from(comment))
         .toList();
@@ -75,9 +76,21 @@ class _TopicScreenState extends State<TopicScreen> {
                 itemCount: comments.length,
                 itemBuilder: (context, index) {
                   final comment = comments[index];
+
+                  // Verificação do autor do comentário
+                  final author = comment['author'];
+                  String authorName;
+
+                  if (author is Map && author.containsKey('name')) {
+                    authorName = author['name'];
+                  } else {
+                    authorName =
+                        'Autor desconhecido'; // Tratamento temporário para depuração
+                  }
+
                   return ListTile(
-                    title: Text(comment['author']['name']),
-                    subtitle: Text(comment['content']),
+                    title: Text(authorName),
+                    subtitle: Text(comment['content'] ?? ''),
                     trailing: Text(
                       comment['timestamp'] ?? '',
                       style: TextStyle(fontSize: 12, color: Colors.grey),

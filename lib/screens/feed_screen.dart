@@ -35,14 +35,43 @@ class _FeedScreenState extends State<FeedScreen> {
     }
   }
 
-  Future<void> _addPost(String title, String description) async {
+  Future<void> _addPost(String title, String description, String tag) async {
     try {
-      print(
-          "Tentando criar um post com título: $title e descrição: $description");
-      await apiService.createPost(title, description, widget.currentUser.id);
+      await apiService.createPost(
+          title, description, tag, widget.currentUser.id);
       _loadPosts();
     } catch (e) {
       print('Erro ao criar post: $e');
+    }
+  }
+
+  LinearGradient _getGradient(String tag) {
+    switch (tag) {
+      case 'gay':
+        return LinearGradient(
+            colors: [Color(0xFF00FF00), Color(0xFFFFFFFF), Color(0xFF0000FF)]);
+      case 'lesbica':
+        return LinearGradient(
+            colors: [Color(0xFFFFA500), Color(0xFFFFFFFF), Color(0xFFFF69B4)]);
+      case 'trans':
+        return LinearGradient(
+            colors: [Color(0xFFFFB6C1), Color(0xFFFFFFFF), Color(0xFFADD8E6)]);
+      case 'bi':
+        return LinearGradient(
+            colors: [Color(0xFFFF1493), Color(0xFF8A2BE2), Color(0xFF0000FF)]);
+      case 'queer':
+        return LinearGradient(
+            colors: [Color(0xFF9370DB), Color(0xFFFFFFFF), Color(0xFF32CD32)]);
+      case 'geral':
+      default:
+        return LinearGradient(colors: [
+          Color.fromARGB(141, 255, 0, 0),
+          Color.fromARGB(141, 255, 166, 0),
+          Color.fromARGB(139, 255, 255, 0),
+          Color.fromARGB(144, 0, 128, 0),
+          Color.fromARGB(143, 0, 0, 255),
+          Color.fromARGB(143, 76, 0, 130)
+        ]);
     }
   }
 
@@ -93,29 +122,45 @@ class _FeedScreenState extends State<FeedScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(16),
-                    title: Text(
-                      post['title'],
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: _getGradient(post['tag']),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Autor: ${post['author']['name']}"),
-                        SizedBox(height: 8),
-                        Text(
-                          post['description'],
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 16),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(16),
+                      title: Text(
+                        post['title'],
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: const Color.fromARGB(255, 37, 36, 36),
                         ),
-                      ],
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Tag: ${post['tag']}",
+                            style: TextStyle(
+                                color: const Color.fromARGB(179, 54, 54, 54)),
+                          ),
+                          Text("Autor: ${post['author']['name']}",
+                              style: TextStyle(
+                                  color:
+                                      const Color.fromARGB(179, 54, 54, 54))),
+                          Text(
+                            post['description'],
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: const Color.fromARGB(179, 54, 54, 54)),
+                          ),
+                        ],
+                      ),
+                      onTap: () => _navigateToTopicScreen(post),
                     ),
-                    onTap: () => _navigateToTopicScreen(post),
                   ),
                 );
               },

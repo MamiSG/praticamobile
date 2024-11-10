@@ -1,23 +1,30 @@
 import 'package:flutter/material.dart';
 
-class NewPostScreen extends StatelessWidget {
-  final Function(String title, String description) onPostCreated;
+class NewPostScreen extends StatefulWidget {
+  final Function(String title, String description, String tag) onPostCreated;
 
   NewPostScreen({required this.onPostCreated});
 
+  @override
+  _NewPostScreenState createState() => _NewPostScreenState();
+}
+
+class _NewPostScreenState extends State<NewPostScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  String selectedTag = 'geral';
 
   void _createPost(BuildContext context) {
     final title = _titleController.text;
     final description = _descriptionController.text;
 
-    if (title.isNotEmpty && description.isNotEmpty) {
-      print("Criando post com título: $title e descrição: $description");
-      onPostCreated(title, description);
+    if (title.isNotEmpty && description.isNotEmpty && selectedTag.isNotEmpty) {
+      widget.onPostCreated(title, description, selectedTag);
       Navigator.pop(context);
     } else {
-      print("Erro: título ou descrição estão vazios");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Todos os campos são obrigatórios!")),
+      );
     }
   }
 
@@ -40,6 +47,25 @@ class NewPostScreen extends StatelessWidget {
               controller: _descriptionController,
               decoration: InputDecoration(labelText: "Descrição"),
               maxLines: 5,
+            ),
+            SizedBox(height: 10),
+            DropdownButton<String>(
+              value: selectedTag,
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    selectedTag = newValue;
+                  });
+                }
+              },
+              items: <String>['gay', 'lesbica', 'trans', 'bi', 'queer', 'geral']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value.toUpperCase()),
+                );
+              }).toList(),
+              hint: Text("Selecione uma Tag"),
             ),
             SizedBox(height: 20),
             ElevatedButton(
