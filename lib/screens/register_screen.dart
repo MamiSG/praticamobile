@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import '../services/api_service.dart';
 
 class RegisterScreen extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final ApiService apiService = ApiService(); // Instância do serviço de API
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +84,10 @@ class RegisterScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      // Chama o método para criar a conta
+                      await _registerUser(context);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.pinkAccent,
                       padding:
@@ -110,5 +115,30 @@ class RegisterScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _registerUser(BuildContext context) async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Todos os campos são obrigatórios!")),
+      );
+      return;
+    }
+
+    try {
+      await apiService.registerUser(name, email, password);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Conta criada com sucesso!")),
+      );
+      Navigator.pop(context); // Volta para a tela de login após o cadastro
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao criar conta: $e")),
+      );
+    }
   }
 }

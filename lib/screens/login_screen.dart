@@ -3,10 +3,12 @@ import 'package:lottie/lottie.dart';
 import 'package:manifesto/screens/register_screen.dart';
 import 'feed_screen.dart';
 import '../models/user.dart';
+import '../services/api_service.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final ApiService apiService = ApiService(); // Instância do serviço de API
 
   @override
   Widget build(BuildContext context) {
@@ -72,20 +74,8 @@ class LoginScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FeedScreen(
-                            currentUser: User(
-                              id: '1',
-                              name: 'Usuário Exemplo',
-                              email: _emailController.text,
-                              password: _passwordController.text,
-                            ),
-                          ),
-                        ),
-                      );
+                    onPressed: () async {
+                      await _handleLogin(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.pinkAccent,
@@ -118,5 +108,31 @@ class LoginScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _handleLogin(BuildContext context) async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Email e senha são obrigatórios!")),
+      );
+      return;
+    }
+
+    try {
+      final user = await apiService.loginUser(email, password);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FeedScreen(currentUser: user),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao fazer login: $e")),
+      );
+    }
   }
 }
